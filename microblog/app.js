@@ -8,13 +8,17 @@ var bodyParser = require('body-parser');
 var routes = require('./routes/index');
 var users = require('./routes/users');
 
+var flash = require('connect-flash');
+var session = require('express-session');
+var partials = require("express-partials");
+var log = require('./log');
+
 var app = express();
 
+log.use(app);
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
-
-var partials = require("express-partials");
 app.use(partials());
 
 // uncomment after placing your favicon in /public
@@ -24,6 +28,32 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
+//mongo store
+var settings = require('./settings');
+
+var MongoStore = require('connect-mongo')(session);
+app.use(session({
+  secret: settings.cookieSecret,
+  store: new MongoStore({
+    db: settings.db
+  })
+}));
+
+
+app.use(flash());
+
+app.use(function(req,res,next){
+  res.locals.user = req.session.user;
+  res.locals.post = req.session.post;
+
+  var error = req.flash('error');
+  res.locals.error = error.length ? error : null;
+
+  var success = req.flash('success');
+  res.locals.success = success.length ? success : null;
+  next();
+});
 
 app.use('/', routes);
 app.use('/users', users);
