@@ -18,7 +18,7 @@ router.get('/', function(req, res, next) {
 
 });
 
-router.get('reg',checkNotLogin);
+router.get('/reg',checkNotLogin);
 router.get('/reg',function(req,res,next){
   res.render('reg',{title:'用户注册'});
 });

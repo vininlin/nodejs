@@ -39,7 +39,6 @@ User.prototype.save = function save(callback){
 }
 
 User.get = function get(username,callback){
-    console.log("username=%s",username);
     mongodb.open(function(err,db){
         if(err) return callback(err);
         //读取users集合
@@ -51,7 +50,6 @@ User.get = function get(username,callback){
             //查找name属性为username的文档
             collection.findOne({name: username},function(err,doc){
                 mongodb.close();
-                console.log("doc=%s",doc);
                 if(doc){
                     //封装为user对象
                     var user = new User(doc);
